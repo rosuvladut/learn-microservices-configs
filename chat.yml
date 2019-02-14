@@ -15,7 +15,7 @@ spring:
         - RewritePath=/articlesService/(?<segment>.*), /$\{segment}
         - RewritePath=/articlesService, /
         - SaveSession
-      - id: images
+      - id: articles
         uri: lb://ARTICLES
         predicates:
         - Path=/articles/**
