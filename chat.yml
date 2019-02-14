@@ -1,0 +1,77 @@
+server:
+  port: 8080
+  
+# tag::zuul[]
+spring:
+  cloud:
+    gateway:
+      routes:
+      # ========================================================
+      - id: imagesService
+        uri: lb://IMAGES
+        predicates:
+        - Path=/imagesService/**
+        filters:
+        - RewritePath=/imagesService/(?<segment>.*), /$\{segment}
+        - RewritePath=/imagesService, /
+        - SaveSession
+      - id: images
+        uri: lb://IMAGES
+        predicates:
+        - Path=/images/**
+        filters:
+        - SaveSession
+      - id: mainCss
+        uri: lb://IMAGES
+        predicates:
+        - Path=/main.css
+        filters:
+        - SaveSession
+      - id: commentsService
+        uri: lb://IMAGES
+        predicates:
+        - Path=/comments/**
+        filters:
+        - SaveSession
+# end::zuul[]
+    stream:
+      bindings:
+        input:
+          destination: learning-spring-boot-chat
+          group: comments-chat
+          content-type: application/json
+        newComments:
+          destination: learning-spring-boot-chat
+          group: comments-chat
+          content-type: application/json
+        clientToBroker:
+          destination: learning-spring-boot-chat-user-messages
+          group: app-chatMessages
+        brokerToClient:
+          destination: learning-spring-boot-chat-user-messages
+          group: topic-chatMessages
+
+# tag::secured[]
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://user:password@localhost:8761/eureka
+# end::secured[]
+
+# tag::security[]
+security:
+  sessions: always
+# end::security[]
+
+# tag::ribbon[]
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 60000
+ribbon:
+  ConnectTimeout: 3000
+  ReadTimeout: 60000
+# end::ribbon[]
