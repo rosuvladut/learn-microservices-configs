@@ -1,34 +1,34 @@
 server:
   port: 8080
   
-# tag::zuul[]
+
 spring:
   cloud:
     gateway:
       routes:
       # ========================================================
-      - id: imagesService
-        uri: lb://IMAGES
+      - id: articlesService
+        uri: lb://ARTICLES
         predicates:
-        - Path=/imagesService/**
+        - Path=/articlesService/**
         filters:
-        - RewritePath=/imagesService/(?<segment>.*), /$\{segment}
-        - RewritePath=/imagesService, /
+        - RewritePath=/articlesService/(?<segment>.*), /$\{segment}
+        - RewritePath=/articlesService, /
         - SaveSession
       - id: images
-        uri: lb://IMAGES
+        uri: lb://ARTICLES
         predicates:
-        - Path=/images/**
+        - Path=/articles/**
         filters:
         - SaveSession
       - id: mainCss
-        uri: lb://IMAGES
+        uri: lb://ARTICLES
         predicates:
         - Path=/main.css
         filters:
         - SaveSession
       - id: commentsService
-        uri: lb://IMAGES
+        uri: lb://ARTICLES
         predicates:
         - Path=/comments/**
         filters:
@@ -51,19 +51,18 @@ spring:
           destination: learning-spring-boot-chat-user-messages
           group: topic-chatMessages
 
-# tag::secured[]
+
 eureka:
   client:
     serviceUrl:
       defaultZone: http://user:password@localhost:8761/eureka
-# end::secured[]
 
-# tag::security[]
+
+
 security:
   sessions: always
-# end::security[]
 
-# tag::ribbon[]
+
 hystrix:
   command:
     default:
@@ -74,4 +73,3 @@ hystrix:
 ribbon:
   ConnectTimeout: 3000
   ReadTimeout: 60000
-# end::ribbon[]
